@@ -1,0 +1,3 @@
+Pengalaman programming saya dimulai dari masa kuliah menggunkan bahasa Python untuk penggunaan lebih ke arah data analis untuk mengolah dan visualisasi data. Saya mulai tertarik ke duania web saat semester 6 ketika menjalani Kerja Praktik yang kebetulan memiliki tema tentang web. Saya mulai serius mendalami web setelah saya lulus sidang skripsi terutama selama saya mengikuti Candradimuka Jabar Coding Camp Batch 1 pada kelas Backend NodeJS. Sekarang, Alhamdulillah, saya sudah mulai bekerja sebagai web developer di perusahaan swasta di daerah Bintaro Tangerang Selatan. 
+
+Kemudian saya mengikuti JCC batch 2 ini dengan harapan untuk lebih memantapkan skill web saya sehingga saya bisa lebih percaya diri dibidang web developer ini.
