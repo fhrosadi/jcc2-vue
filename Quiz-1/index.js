@@ -39,3 +39,51 @@ jumlah_kata(kalimat_1)
 jumlah_kata(kalimat_2)
 jumlah_kata(kalimat_3)
 
+
+// No2
+
+console.log('\n\nNo 2\n')
+
+function next_date(d,m,y){
+    var nDayPerMonth = {
+        Januari : 31,
+        Februari : 28,
+        Maret : 31,
+        April : 30,
+        Mei : 31,
+        Juni : 30,
+        Juli : 31,
+        Agustus : 31,
+        September : 30,
+        Oktober : 31,
+        November : 30,
+        Desember : 31
+    }
+    // Cek Kabisat
+    if((y%4==0) && (y%100!=0) || (y%400==0)){
+        nDayPerMonth.Februari = 29
+    }
+
+    namaBulan = Object.keys(nDayPerMonth)
+    nHari = Object.values(nDayPerMonth)
+
+    if(d == nHari[m-1]){
+        d =1
+        if(m==12){
+            m = 1
+            y = y+1
+        }else{
+            m = m+1
+        }
+    }else{
+        d=d+1
+    }
+    console.log('output: '+d+' '+namaBulan[m-1]+' '+y)
+
+}
+
+var tanggal = 28
+var bulan = 2
+var tahun = 2020
+
+next_date(tanggal , bulan , tahun )
