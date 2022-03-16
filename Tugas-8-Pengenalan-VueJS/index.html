@@ -29,7 +29,9 @@
                     set(params) {
                         let arr = params.split(" ")
                         this.firstName = arr[0]
-                        this.lastName = arr[1]
+                        arr.shift()
+                        let last = arr.join(" ")
+                        this.lastName = last
                     }
                 }
             },
