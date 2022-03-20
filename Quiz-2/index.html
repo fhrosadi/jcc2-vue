@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tugas 1</title>
+</head>
+
+<body>
+    <div id="app">
+        <div>
+            <input type="text" v-model="textInput" />
+            <button v-if="isEdit == true" @click="editUser()">Update</button>
+            <button v-else @click="addUser()">Add</button>
+        </div>
+        <div>
+            <ul>
+                <li style="margin-top: 10px" v-for="user in users">
+                    <span>{{user.name}}</span>
+                    <button @click="selectUser(user.name)">Edit</button>
+                    |
+                    <button @click="deleteUser(user.name)">Delete</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                users: [{
+                    name: 'Muhammad Iqbal Mubarok'
+                }, {
+                    name: 'Ruby Purwanti'
+                }, {
+                    name: 'Faqih Muhammad'
+                }],
+                textInput: '',
+                selectedUser: '',
+                idSelectedUser: '',
+                isEdit: false,
+            },
+            computed: {},
+            methods: {
+                addUser() {
+                    this.users.push({
+                        name: this.textInput
+                    })
+                    this.textInput = ''
+                },
+                selectUser(nama) {
+                    for (let i = 0; i < this.users.length; i++) {
+                        if (this.users[i].name == nama) {
+                            this.selectedUser = this.users[i].name
+                            this.textInput = this.users[i].name
+                            this.idSelectedUser = i
+                        }
+                    }
+                    this.isEdit = true
+                },
+                editUser() {
+                    for (let i = 0; i < this.users.length; i++) {
+                        if (i == this.idSelectedUser) {
+                            this.users[i].name = this.textInput
+                        }
+                    }
+                    this.textInput = ''
+                    this.isEdit = false
+                },
+                deleteUser(name) {
+                    let result = confirm('Anda yakin ?')
+                    if (result) {
+                        let remainUsers = this.users.filter(function (user) {
+                            return user.name != name
+                        })
+
+                        this.users = remainUsers
+                    }
+                },
+            },
+        })
+    </script>
+</body>
+
+</html>
