@@ -1,0 +1,305 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tugas 12 Ajax dan Axios</title>
+
+</head>
+
+<body>
+    <div id="app">
+        <div>
+            <form @submit.prevent="submitForm()">
+                <h4>Input Data</h4>
+
+                <!-- Errors -->
+                <div v-if="errors.length">
+                    <div>
+                        <h5>Error:</h5>
+                        <ul>
+                            <li v-for="error in errors">{{error}}</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Errors -->
+
+                <div>
+                    <h3>Nama:</h3>
+                    <input type="text" ref="name" v-model="form.name" :disabled="buttonStatus == 'upload'" />
+                </div>
+                <div>
+                    <h3>Alamat:</h3>
+                    <textarea rows="4" ref="address" v-model="form.address"
+                        :disabled="buttonStatus == 'upload'"></textarea>
+                </div>
+                <div>
+                    <h3>No hp:</h3>
+                    <input type="text" ref="no_hp" v-model="form.no_hp" :disabled="buttonStatus == 'upload'" />
+                </div>
+                <div v-if="buttonStatus == 'upload'">
+                    <input type="file" name="photo" ref="photo" />
+                    <button type="button" @click="submitPhoto(form.id)">
+                        Upload Foto
+                    </button>
+                    <button type="button" @click="cancelButton()">Cancel</button>
+                </div>
+                <!-- Button Submit & Update-->
+                <div v-if="buttonStatus == 'submit'">
+                    <button type="submit">Submit</button>
+                </div>
+                <div v-else-if="buttonStatus == 'update'">
+                    <button type="button" @click="updateUser(form.id)">Update</button>
+                    <button type="button" @click="cancelButton()">Cancel</button>
+                </div>
+                <!-- Button -->
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div>
+            <div>
+                <div>
+                    <div>
+                        <div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Foto</th>
+                                        <th scope="col">Nama</th>
+                                        <th scope="col">No Hp</th>
+                                        <th scope="col">Alamat</th>
+                                        <th scope="col">Tanggal Pembuatan</th>
+                                        <th scope="col">Role</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="user in users">
+                                        <td>
+                                            <img style="width: 100px;" v-if="user.photo_profile"
+                                                :src="url + user.photo_profile" />
+                                            <img style="width: 100px;" v-else src="https://dummyimage.com/16:9x1080"
+                                                alt="" />
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <h4>{{user.name}}</h4>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span> {{user.no_hp}} </span>
+                                        </td>
+                                        <td>{{user.address}}</td>
+                                        <td>{{user.created_at.split(' ')[0]}}</td>
+                                        <td>
+                                            <button @click="editUser(user)">Edit</button>
+                                            <span>||</span>
+                                            <button @click="deleteUser(user.id)">Hapus</button>
+                                            <span>||</span>
+                                            <button @click="uploadFoto(user)">Upload Foto</button>
+                                        </td>
+                                    </tr>
+
+                                    <!-- More people... -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Table -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                url: 'http://demo-api-vue.sanbercloud.com',
+                errors: [],
+                users: [],
+                form: {
+                    id: '',
+                    name: '',
+                    address: '',
+                    no_hp: '',
+                },
+                buttonStatus: 'submit',
+            },
+            methods: {
+                validationForm: function () {
+                    this.errors = []
+
+                    if (this.form.name < 5) {
+                        this.errors.push('Nama minimal 5 karakter')
+                        this.$refs.name.focus()
+                    }
+
+                    if (this.form.address.length > 30) {
+                        this.errors.push('Alamat tidak boleh lebih dari 30 karakter')
+                        this.$refs.address.focus()
+                    }
+
+                    if (this.form.no_hp.length == 0) {
+                        this.errors.push('No hp harus di isi')
+                        this.$refs.no_hp.focus()
+                    }
+                },
+
+                clearForm: function () {
+                    ;
+                    (this.form.id = null), (this.form.name = ''), (this.form.address = ''), (this.form
+                        .no_hp = '')
+                },
+
+                submitForm: function () {
+                    this.validationForm()
+
+                    if (this.errors.length === 0) {
+                        let formData = new FormData()
+                        formData.append('name', this.form.name)
+                        formData.append('address', this.form.address)
+                        formData.append('no_hp', this.form.no_hp)
+
+                        const config = {
+                            method: 'post',
+                            url: `${this.url}/api/member`,
+                            data: formData,
+                        }
+
+                        axios(config)
+                            .then((response) => {
+                                this.clearForm()
+                                this.getUsers()
+                                alert(response.data.message)
+                            })
+                            .catch((error) => {
+                                console.log(error)
+                            })
+                    }
+                },
+
+                getUsers: function () {
+                    const config = {
+                        method: 'get',
+                        url: `${this.url}/api/member`,
+                    }
+
+                    axios(config)
+                        .then((response) => {
+                            this.users = response.data.members
+                        })
+                        .catch((error) => {
+                            console.log(error)
+                        })
+                },
+
+                editUser: function (user) {
+                    this.buttonStatus = 'update'
+
+                    this.form.id = user.id
+                    this.form.name = user.name
+                    this.form.address = user.address
+                    this.form.no_hp = user.no_hp
+                },
+
+                uploadFoto: function (user) {
+                    this.buttonStatus = 'upload'
+
+                    this.form.id = user.id
+                    this.form.name = user.name
+                    this.form.address = user.address
+                    this.form.no_hp = user.no_hp
+                },
+
+                updateUser: function (id) {
+                    this.validationForm()
+
+                    if (this.errors.length === 0) {
+                        let formData = new FormData()
+                        formData.append('name', this.form.name)
+                        formData.append('address', this.form.address)
+                        formData.append('no_hp', this.form.no_hp)
+
+                        const config = {
+                            method: 'post',
+                            url: `${this.url}/api/member/${id}`,
+                            params: {
+                                _method: 'PUT'
+                            },
+                            data: formData,
+                        }
+
+                        axios(config)
+                            .then((response) => {
+                                this.clearForm()
+                                this.getUsers()
+                                alert(response.data.message)
+                            })
+                            .catch((error) => {
+                                console.log(error)
+                            })
+                    }
+                },
+
+                submitPhoto: function (id) {
+                    let file = this.$refs.photo.files[0]
+
+                    let formData = new FormData()
+                    formData.append('photo_profile', file)
+
+                    const config = {
+                        method: 'post',
+                        url: `${this.url}/api/member/${id}/upload-photo-profile`,
+                        data: formData,
+                    }
+
+                    axios(config)
+                        .then((response) => {
+                            this.clearForm()
+                            this.getUsers()
+                            this.buttonStatus = 'submit'
+                            alert(response.data.message)
+                        })
+                        .catch((error) => {
+                            console.log(error)
+                        })
+                    // photo_profile
+                },
+
+                deleteUser: function (id) {
+                    const config = {
+                        method: 'post',
+                        url: `${this.url}/api/member/${id}`,
+                        params: {
+                            _method: 'DELETE'
+                        },
+                    }
+
+                    axios(config)
+                        .then((response) => {
+                            this.getUsers()
+                            alert(response.data.message)
+                        })
+                        .catch((error) => {
+                            console.log(error)
+                        })
+                },
+
+                cancelButton: function () {
+                    this.clearForm()
+                    this.buttonStatus = 'submit'
+                },
+            },
+            created() {
+                this.getUsers()
+            },
+        })
+    </script>
+</body>
+
+</html>
